@@ -404,77 +404,56 @@
         </div>
       </div>
 
-      <section class="contact-section">
-        <h2>Get in Touch</h2>
-        <p>Feedback? Bugs? Feature ideas? Let us know.</p>
-
-        <form id="contact-form">
-          <div class="form-group">
-            <input
-              type="text"
-              id="name"
-              required
-              placeholder="Your Name"
-            />
-          </div>
-
-          <div class="form-group">
-            <textarea
-              id="message"
-              rows="4"
-              required
-              placeholder="Your Message"
-            ></textarea>
-          </div>
-
-          <button type="submit" class="submit-btn">Send Message</button>
-        </form>
-      </section>
-    </main>
-
-    <footer>
-      <p>&copy; 2025 MiniTune. Crafted for music lovers.</p>
-    </footer>
-
-    <script>
-      document
-        .getElementById("contact-form")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-
-          const nameInput = document.getElementById("name");
-          const messageInput = document.getElementById("message");
-          const name = nameInput.value.trim().substring(0, 50);
-          const message = messageInput.value.trim().substring(0, 500);
-
-          if (!/^[a-zA-Z ]{2,30}$/.test(name)) {
-            alert("Please enter a valid name (letters and spaces only)");
-            return;
-          }
-
-          if (!/^[\w\s.,!?()-]{10,500}$/.test(message)) {
-            alert("Please enter a valid message (10-500 characters)");
-            return;
-          }
-
-          const lastSubmit = parseInt(localStorage.getItem("lastSubmit") || 0);
-          if (Date.now() - lastSubmit < 30000) {
-            alert("Please wait 30 seconds between submissions");
-            return;
-          }
-          localStorage.setItem("lastSubmit", Date.now());
-
-          if (
-            confirm(
-              "This will open your email client to send the message. Continue?"
-            )
-          ) {
-            const mailtoLink = `mailto:giriaakash00@gmail.com?subject=MiniTune Feedback from ${encodeURIComponent(
-              name
-            )}&body=${encodeURIComponent(message)}`;
-            window.location.href = mailtoLink;
-          }
-        });
-    </script>
-  </body>
+            <section class="contact-section">
+              <h2>Get in Touch</h2>
+              <p>
+                Feedback? Bugs? Feature ideas? Email us directly or join our community.
+              </p>
+      
+              <div class="contact-actions">
+                          <a href="mailto:giriaakash00@gmail.com" class="email-btn">
+                            <span class="icon">✉️</span> Contact Support
+                          </a>              </div>
+            </section>
+          </main>
+      
+          <footer>
+            <p>&copy; 2025 MiniTune. Crafted for music lovers.</p>
+          </footer>
+      
+          <style>
+            /* New Contact Button Styles */
+            .contact-actions {
+              display: flex;
+              justify-content: center;
+              margin-top: 30px;
+            }
+      
+            .email-btn {
+              display: inline-flex;
+              align-items: center;
+              gap: 12px;
+              background: transparent;
+              color: var(--primary);
+              border: 2px solid var(--primary);
+              padding: 16px 40px;
+              border-radius: 50px;
+              text-decoration: none;
+              font-size: 1.2rem;
+              font-weight: 600;
+              transition: all 0.3s ease;
+              box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+            }
+      
+            .email-btn:hover {
+              background: var(--primary);
+              color: #000;
+              box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+              transform: translateY(-3px);
+            }
+      
+            .email-btn .icon {
+              font-size: 1.4rem;
+            }
+          </style>  </body>
 </html>
