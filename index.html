@@ -232,7 +232,7 @@
         font-size: 1.05rem;
       }
 
-      /* Minimal Contact Form */
+      /* Minimal Contact Section */
       .contact-section {
         max-width: 500px;
         margin: 0 auto 100px;
@@ -249,55 +249,24 @@
         margin-bottom: 40px;
       }
 
-      form {
-        text-align: left;
-      }
-
-      .form-group {
-        margin-bottom: 30px;
-        position: relative;
-      }
-
-      input, textarea {
-        width: 100%;
-        background: transparent;
-        border: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 15px 0;
-        color: #fff;
-        font-size: 1.1rem;
-        font-family: inherit;
-        transition: border-color 0.3s;
-        resize: vertical;
-      }
-
-      input:focus, textarea:focus {
-        outline: none;
-        border-bottom-color: var(--primary);
-      }
-
-      input::placeholder, textarea::placeholder {
-        color: rgba(255, 255, 255, 0.3);
-      }
-
-      .submit-btn {
-        width: 100%;
-        background: transparent;
+      .email-display {
+        display: inline-block;
+        padding: 20px 40px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
         color: var(--primary);
-        border: 1px solid var(--primary);
-        padding: 15px;
-        font-size: 1rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        cursor: pointer;
-        transition: all 0.3s;
+        font-size: 1.2rem;
+        font-family: monospace;
+        letter-spacing: 1px;
+        user-select: all;
+        transition: all 0.3s ease;
       }
 
-      .submit-btn:hover {
-        background: var(--primary);
-        color: #000;
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+      .email-display:hover {
+        background: rgba(0, 255, 255, 0.1);
+        border-color: var(--primary);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
       }
 
       footer {
@@ -404,56 +373,20 @@
         </div>
       </div>
 
-            <section class="contact-section">
-              <h2>Get in Touch</h2>
-              <p>
-                Feedback? Bugs? Feature ideas? Email us directly or join our community.
-              </p>
-      
-              <div class="contact-actions">
-                          <a href="mailto:giriaakash00@gmail.com" class="email-btn">
-                            <span class="icon">✉️</span> Contact Support
-                          </a>              </div>
-            </section>
-          </main>
-      
-          <footer>
-            <p>&copy; 2025 MiniTune. Crafted for music lovers.</p>
-          </footer>
-      
-          <style>
-            /* New Contact Button Styles */
-            .contact-actions {
-              display: flex;
-              justify-content: center;
-              margin-top: 30px;
-            }
-      
-            .email-btn {
-              display: inline-flex;
-              align-items: center;
-              gap: 12px;
-              background: transparent;
-              color: var(--primary);
-              border: 2px solid var(--primary);
-              padding: 16px 40px;
-              border-radius: 50px;
-              text-decoration: none;
-              font-size: 1.2rem;
-              font-weight: 600;
-              transition: all 0.3s ease;
-              box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
-            }
-      
-            .email-btn:hover {
-              background: var(--primary);
-              color: #000;
-              box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
-              transform: translateY(-3px);
-            }
-      
-            .email-btn .icon {
-              font-size: 1.4rem;
-            }
-          </style>  </body>
+      <section class="contact-section">
+        <h2>Get in Touch</h2>
+        <p>
+          Feedback? Bugs? Feature ideas? Email us directly or join our community.
+        </p>
+
+        <div class="email-display">
+          giriaakash00@gmail.com
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 MiniTune. Crafted for music lovers.</p>
+    </footer>
+  </body>
 </html>
