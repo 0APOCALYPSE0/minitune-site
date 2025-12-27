@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MiniTune - Chrome Extension</title>
+    <title>MiniTune - Seamless Music Control for Spotify</title>
     <link rel="icon" type="image/png" href="MiniTune_16x16.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,6 +14,7 @@
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self';
+               script-src 'self' 'unsafe-inline';
                img-src 'self' data:;
                style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
                font-src 'self' https://fonts.gstatic.com;
@@ -31,6 +32,8 @@
         --text: #ffffff;
         --text-dim: rgba(255, 255, 255, 0.6);
         --accent-glow: rgba(0, 255, 255, 0.15);
+        --card-bg: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.1);
       }
 
       * {
@@ -98,8 +101,8 @@
       }
 
       .logo-container img {
-        width: 90px;
-        height: 90px;
+        width: 128px;
+        height: 128px;
         filter: drop-shadow(0 0 25px rgba(0, 255, 255, 0.4));
         margin-bottom: 20px;
         animation: float 6s ease-in-out infinite;
@@ -128,7 +131,7 @@
       header p {
         font-size: 1.2rem;
         color: var(--text-dim);
-        max-width: 500px;
+        max-width: 600px;
         margin: 0 auto 40px;
       }
 
@@ -137,6 +140,7 @@
         display: flex;
         gap: 15px;
         justify-content: center;
+        flex-wrap: wrap;
       }
 
       .cta-button {
@@ -156,7 +160,7 @@
         box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
       }
 
-      .telegram-button {
+      .secondary-button {
         display: flex;
         align-items: center;
         gap: 8px;
@@ -169,56 +173,232 @@
         transition: all 0.2s;
       }
 
-      .telegram-button:hover {
+      .secondary-button:hover {
         border-color: var(--primary);
         background: rgba(0, 255, 255, 0.05);
       }
 
-      .telegram-button img {
+      .secondary-button img {
         width: 20px;
+        height: 20px;
       }
 
-      /* Showcase Image */
-      .showcase {
-        margin: 60px auto 120px;
-        text-align: center;
-        perspective: 1000px;
+      /* Hero Video Section removed - merged into carousel */
+
+      /* Browser Carousel Design */
+      .carousel-section {
+        margin: 60px auto 150px;
+        perspective: 1500px;
+        padding: 0 20px;
+      }
+      
+      .slide video {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: #000;
       }
 
-      .showcase img {
-        max-width: 90%;
+      .browser-frame {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: #0f0f12;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 12px;
-        box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
-        transform: rotateX(10deg);
+        box-shadow: 0 20px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        transform: rotateX(5deg);
         transition: transform 0.5s ease;
+        position: relative;
       }
 
-      .showcase:hover img {
-        transform: rotateX(0deg) scale(1.02);
+      .browser-frame:hover {
+        transform: rotateX(0deg) scale(1.01);
+        box-shadow: 0 30px 100px rgba(0, 255, 255, 0.15);
       }
 
-      /* Feature Grid - Clean & Minimal */
+      .window-header {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .window-dots {
+        display: flex;
+        gap: 8px;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .dot.red { background: #ff5f56; }
+      .dot.yellow { background: #ffbd2e; }
+      .dot.green { background: #27c93f; }
+
+      .address-bar {
+        margin-left: 20px;
+        flex-grow: 1;
+        background: rgba(0, 0, 0, 0.2);
+        height: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        font-family: monospace;
+      }
+
+      .carousel-viewport {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/10; 
+        background: #000;
+      }
+
+      .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      .slide.active {
+        opacity: 1;
+        pointer-events: auto;
+        z-index: 2;
+      }
+
+      .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      /* Carousel Controls */
+      .carousel-nav {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 8px 16px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-dot {
+        width: 10px;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .nav-dot:hover { background: #fff; }
+      .nav-dot.active { background: var(--primary); transform: scale(1.2); }
+
+      .nav-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        transition: all 0.2s;
+        backdrop-filter: blur(5px);
+        opacity: 0;
+        pointer-events: auto;
+      }
+
+      .browser-frame:hover .nav-arrow { opacity: 1; }
+      .nav-arrow:hover { background: var(--primary); color: #000; }
+      .nav-arrow.prev { left: 20px; }
+      .nav-arrow.next { right: 20px; }
+
+      /* Sections */
+      .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: #fff;
+      }
+
+      .section-subtitle {
+        text-align: center;
+        color: var(--text-dim);
+        margin-bottom: 60px;
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Premium Badge */
+      .premium-badge {
+        display: inline-block;
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        color: #000;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+      }
+
+      /* Feature Grid */
       .features-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 60px;
+        gap: 40px;
         margin-bottom: 150px;
       }
 
       .feature-item {
-        padding: 20px;
-        transition: transform 0.3s ease;
+        padding: 30px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        transition: all 0.3s ease;
       }
 
       .feature-item:hover {
         transform: translateY(-5px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       }
 
       .feature-icon {
         font-size: 2rem;
         color: var(--primary);
         margin-bottom: 20px;
-        text-shadow: 0 0 20px var(--primary);
       }
 
       .feature-item h3 {
@@ -229,70 +409,170 @@
 
       .feature-item p {
         color: var(--text-dim);
-        font-size: 1.05rem;
+        font-size: 1rem;
       }
 
-      /* Minimal Contact Section */
-      .contact-section {
-        max-width: 500px;
-        margin: 0 auto 100px;
+      /* Hotkeys Table */
+      .hotkeys-section {
+        margin-bottom: 150px;
+      }
+      
+      .hotkeys-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .hotkey-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--card-bg);
+        padding: 15px 20px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      .hotkey-action {
+        font-weight: 600;
+      }
+
+      .kbd {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        font-size: 0.9rem;
+        color: var(--primary);
+      }
+
+      /* Support & Connect */
+      .connect-section {
+        margin-bottom: 100px;
         text-align: center;
       }
 
-      .contact-section h2 {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-      }
-
-      .contact-section > p {
-        color: var(--text-dim);
+      .links-grid {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
         margin-bottom: 40px;
       }
 
-      .email-display {
-        display: inline-block;
-        padding: 20px 40px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+      .link-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--card-bg);
+        padding: 15px 25px;
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.05);
-        color: var(--primary);
-        font-size: 1.2rem;
-        font-family: monospace;
-        letter-spacing: 1px;
-        user-select: all;
+        color: #fff;
+        text-decoration: none;
+        border: 1px solid var(--border);
         transition: all 0.3s ease;
       }
 
-      .email-display:hover {
-        background: rgba(0, 255, 255, 0.1);
+      .link-card:hover {
+        background: rgba(255, 255, 255, 0.08);
         border-color: var(--primary);
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
       }
 
+      .donate-group {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+      }
+
+      .donate-btn {
+        background: rgba(255, 0, 100, 0.1);
+        border-color: rgba(255, 0, 100, 0.3);
+        color: #ff5c8d;
+      }
+      
+      .donate-btn:hover {
+        background: rgba(255, 0, 100, 0.2);
+        border-color: #ff5c8d;
+      }
+
+      /* Footer */
       footer {
         text-align: center;
-        padding: 40px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 60px 20px;
+        border-top: 1px solid var(--border);
         color: var(--text-dim);
         font-size: 0.9rem;
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      footer p {
+        margin-bottom: 10px;
+      }
+
+      .disclaimer {
+        font-size: 0.8rem;
+        opacity: 0.5;
+        max-width: 600px;
+        margin: 20px auto 0;
       }
 
       @media (max-width: 768px) {
         header h1 { font-size: 3rem; }
-        .showcase img { transform: none; }
-        .features-grid { gap: 40px; text-align: center; }
+        .features-grid { gap: 20px; }
+        .hotkeys-grid { grid-template-columns: 1fr; }
+        .top-nav { top: 15px; right: 15px; }
+      }
+
+      /* Top Navigation */
+      .top-nav {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        z-index: 100;
+      }
+
+      .nav-link {
+        color: var(--text-dim);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 1px solid transparent;
+      }
+
+      .nav-link:hover {
+        color: #ff5c8d;
+        background: rgba(255, 0, 100, 0.1);
+        border-color: rgba(255, 0, 100, 0.2);
+        transform: translateY(-2px);
       }
     </style>
   </head>
   <body>
+    <nav class="top-nav">
+      <a href="#support" class="nav-link">
+        <span>❤️</span> Support
+      </a>
+    </nav>
+
     <header>
       <div class="logo-container">
         <img src="MiniTune_128x128.png" alt="MiniTune Logo" />
       </div>
+      <div class="premium-badge">✨ No Premium Required</div>
       <h1>MiniTune</h1>
       <p>
-        The sleekest way to control Spotify.
-        Play, pause, and browse without leaving your tab.
+        The seamless way to control Spotify. Play, pause, skip, and manage your music without ever leaving your current tab.
       </p>
 
       <div class="btn-group">
@@ -305,88 +585,288 @@
           Add to Chrome
         </a>
         <a
-          class="telegram-button"
+          class="secondary-button"
           href="https://t.me/MiniTuneSpotify"
           target="_blank"
         >
           <img src="./Telegram_logo.svg" alt="Telegram" />
-          Join Chat
+          Join Community
         </a>
       </div>
     </header>
 
     <main class="container">
-      <div class="showcase">
-        <img
-          src="miniTune-player-1280x800.png"
-          alt="MiniTune Interface"
-        />
-      </div>
+      
+      <div class="carousel-section">
+        <div class="browser-frame">
+          <div class="window-header">
+            <div class="window-dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <div class="address-bar">minitune://playing-now</div>
+          </div>
+          
+          <div class="carousel-viewport">
+            <!-- Slide 1: Video -->
+            <div class="slide active">
+              <video src="MiniTune-Demo.mp4" controls style="width: 100%; height: 100%; object-fit: contain;"></video>
+            </div>
+            <!-- Slide 2 -->
+            <div class="slide">
+              <img src="MiniTune-player-1280x800.png" alt="Player Interface">
+            </div>
+            <!-- Slide 3 -->
+            <div class="slide">
+              <img src="minitune_login_fullhd.png" alt="Login Screen">
+            </div>
+            <!-- Slide 4 -->
+            <div class="slide">
+              <img src="minitune_open_spotify_fullhd.png" alt="Spotify Control">
+            </div>
 
-      <div class="features-grid">
-        <div class="feature-item">
-          <div class="feature-icon">⚡</div>
-          <h3>Instant Control</h3>
-          <p>
-            Skip, pause, or play with zero latency. MiniTune sits quietly in your browser, ready when you are.
-          </p>
-        </div>
-
-        <div class="feature-item">
-          <div class="feature-icon">🎹</div>
-          <h3>Smart Hotkeys</h3>
-          <p>
-            Never touch your mouse. Map custom keyboard shortcuts to control volume, shuffle, and more.
-          </p>
-        </div>
-
-        <div class="feature-item">
-          <div class="feature-icon">🎧</div>
-          <h3>Background Mode</h3>
-          <p>
-            Works flawlessly even when Spotify is minimized. Keep the music flowing while you focus.
-          </p>
-        </div>
-
-        <div class="feature-item">
-          <div class="feature-icon">❤️</div>
-          <h3>Quick Like</h3>
-          <p>
-            Save songs to your library instantly. One click to add the current track to your Favorites.
-          </p>
-        </div>
-
-        <div class="feature-item">
-          <div class="feature-icon">🔊</div>
-          <h3>Precision Volume</h3>
-          <p>
-            Fine-tune your audio levels with a sleek control or an instant mute toggle.
-          </p>
-        </div>
-
-        <div class="feature-item">
-          <div class="feature-icon">🎨</div>
-          <h3>Sleek UI</h3>
-          <p>
-            Designed to look good. A modern, dark aesthetic that fits perfectly into your workflow.
-          </p>
+            <button class="nav-arrow prev" id="prevBtn">&#10094;</button>
+            <button class="nav-arrow next" id="nextBtn">&#10095;</button>
+            
+            <div class="carousel-nav">
+              <span class="nav-dot active" data-index="0"></span>
+              <span class="nav-dot" data-index="1"></span>
+              <span class="nav-dot" data-index="2"></span>
+              <span class="nav-dot" data-index="3"></span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <section class="contact-section">
-        <h2>Get in Touch</h2>
-        <p>
-          Feedback? Bugs? Feature ideas? Email us directly or join our community.
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          let slideIndex = 0;
+          const slides = document.querySelectorAll(".slide");
+          const dots = document.querySelectorAll(".nav-dot");
+          const prevBtn = document.getElementById('prevBtn');
+          const nextBtn = document.getElementById('nextBtn');
+          const video = document.querySelector('video');
+          let autoPlayTimer;
+
+          function showSlide(index) {
+            // Handle wrapping
+            if (index >= slides.length) slideIndex = 0;
+            else if (index < 0) slideIndex = slides.length - 1;
+            else slideIndex = index;
+
+            // Pause video if moving away from it (assuming video is on slide 0)
+            if (slideIndex !== 0 && video && !video.paused) {
+              video.pause();
+            }
+
+            // Update UI
+            slides.forEach(slide => slide.classList.remove("active"));
+            dots.forEach(dot => dot.classList.remove("active"));
+
+            slides[slideIndex].classList.add("active");
+            dots[slideIndex].classList.add("active");
+          }
+
+          function nextSlide() {
+            resetTimer();
+            showSlide(slideIndex + 1);
+          }
+
+          function prevSlide() {
+            resetTimer();
+            showSlide(slideIndex - 1);
+          }
+
+          function jumpToSlide(index) {
+            resetTimer();
+            showSlide(index);
+          }
+
+          function resetTimer() {
+            clearInterval(autoPlayTimer);
+            // Only restart autoplay if video is NOT playing
+            if (!video || video.paused) {
+               startAutoPlay();
+            }
+          }
+
+          function startAutoPlay() {
+            // Don't autoplay if video is playing
+            if (video && !video.paused) return;
+
+            clearInterval(autoPlayTimer);
+            autoPlayTimer = setInterval(() => {
+              showSlide(slideIndex + 1);
+            }, 5000);
+          }
+
+          // Event Listeners
+          if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+          if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+          
+          dots.forEach(dot => {
+            dot.addEventListener('click', (e) => {
+              const index = parseInt(e.target.getAttribute('data-index'));
+              jumpToSlide(index);
+            });
+          });
+
+          // Smart Video Handling
+          if (video) {
+            video.addEventListener('play', () => {
+              clearInterval(autoPlayTimer);
+            });
+            video.addEventListener('pause', () => {
+              // Only restart autoplay if we are essentially done interacting
+              // But maybe user just paused to look. Let's give it a moment or just wait for next interaction.
+              // Actually, standard behavior: if paused, maybe resume slideshow? 
+              // Let's just stick to: if video ends, resume slideshow.
+              // If user manually pauses, we probably shouldn't yank the slide away immediately.
+              // We'll leave autoplay off until manual navigation or video ends.
+            });
+            video.addEventListener('ended', () => {
+              nextSlide(); // Auto advance when video finishes
+            });
+          }
+
+          // Start
+          startAutoPlay();
+        });
+      </script>
+
+      <section>
+        <h2 class="section-title">Why MiniTune?</h2>
+        <p class="section-subtitle">
+          Designed for both Free and Premium Spotify users. Enhance your listening experience without disrupting your workflow.
         </p>
 
-        <div class="email-display">
-          giriaakash00@gmail.com
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon">🔓</div>
+            <h3>Works for Everyone</h3>
+            <p>
+              Unlike other extensions, MiniTune works perfectly for <strong>Free</strong> users too. Enjoy full control over playback, volume, and skipping.
+            </p>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">⚡</div>
+            <h3>Instant Control</h3>
+            <p>
+              Skip, pause, or play with zero latency. MiniTune sits quietly in your browser, ready when you are.
+            </p>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">⌨️</div>
+            <h3>Smart Hotkeys</h3>
+            <p>
+              Never touch your mouse. Map custom keyboard shortcuts to control volume, shuffle, and more.
+            </p>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">❤️</div>
+            <h3>Quick Actions</h3>
+            <p>
+              Like songs, toggle shuffle/repeat, and view real-time song info instantly.
+            </p>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">🔊</div>
+            <h3>Precision Volume</h3>
+            <p>
+              Fine-tune your audio levels with a sleek control or utilize the instant mute toggle.
+            </p>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">🔒</div>
+            <h3>Privacy First</h3>
+            <p>
+              We respect your data. No personal information is collected or shared.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="hotkeys-section">
+        <h2 class="section-title">Master Your Music</h2>
+        <p class="section-subtitle">Control everything with simple keyboard shortcuts.</p>
+        
+        <div class="hotkeys-grid">
+          <div class="hotkey-card">
+            <span class="hotkey-action">Play / Pause</span>
+            <div><span class="kbd">Space</span></div>
+          </div>
+          <div class="hotkey-card">
+            <span class="hotkey-action">Next Song</span>
+            <div><span class="kbd">Ctrl</span> + <span class="kbd">→</span></div>
+          </div>
+          <div class="hotkey-card">
+            <span class="hotkey-action">Previous Song</span>
+            <div><span class="kbd">Ctrl</span> + <span class="kbd">←</span></div>
+          </div>
+          <div class="hotkey-card">
+            <span class="hotkey-action">Volume Up</span>
+            <div><span class="kbd">Ctrl</span> + <span class="kbd">↑</span></div>
+          </div>
+          <div class="hotkey-card">
+            <span class="hotkey-action">Volume Down</span>
+            <div><span class="kbd">Ctrl</span> + <span class="kbd">↓</span></div>
+          </div>
+          <div class="hotkey-card">
+            <span class="hotkey-action">Mute</span>
+            <div><span class="kbd">Ctrl</span> + <span class="kbd">M</span></div>
+          </div>
+          <div class="hotkey-card">
+            <span class="hotkey-action">Shuffle</span>
+            <div><span class="kbd">Ctrl</span> + <span class="kbd">S</span></div>
+          </div>
+          <div class="hotkey-card">
+            <span class="hotkey-action">Repeat</span>
+            <div><span class="kbd">Ctrl</span> + <span class="kbd">R</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="connect-section" id="support">
+        <h2 class="section-title">Stay Connected</h2>
+        <p class="section-subtitle">
+          Follow updates, support the project, or reach out to the developer.
+        </p>
+
+        <div class="links-grid">
+          <a href="https://t.me/MiniTuneSpotify" target="_blank" class="link-card">
+            <span>Telegram Channel</span>
+          </a>
+          <a href="https://www.linkedin.com/in/aakash-giri/" target="_blank" class="link-card">
+            <span>LinkedIn</span>
+          </a>
+          <a href="mailto:giriaakash00@gmail.com" class="link-card">
+            <span>Email Me</span>
+          </a>
+        </div>
+
+        <div class="donate-group">
+          <a href="https://ko-fi.com/aakashgiri" target="_blank" class="secondary-button donate-btn">
+            ☕ Support on Ko-fi
+          </a>
+          <a href="https://www.paypal.com/paypalme/giriaakash04" target="_blank" class="secondary-button donate-btn">
+            💙 Support on PayPal
+          </a>
         </div>
       </section>
     </main>
 
     <footer>
       <p>&copy; 2025 MiniTune. Crafted for music lovers.</p>
+      <p style="font-size: 0.85rem; margin-top: 10px;">Requires Spotify Web Player to be open.</p>
+      <p class="disclaimer">
+        This extension is an independent project and is NOT affiliated with, endorsed by, or associated with Spotify AB.
+      </p>
     </footer>
   </body>
 </html>
